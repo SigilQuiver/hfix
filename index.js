@@ -40,6 +40,10 @@ app.get("/favicon.ico",(req,res) =>{
   res.end();
 });
 
+app.get("/",(req,res) =>{
+  res.end();
+});
+
 //read end of url
 app.get("/{*splat}",async (req,res) =>{
 
@@ -50,33 +54,38 @@ app.get("/{*splat}",async (req,res) =>{
   // get video data
   const video_data = await get_video(url);
 
-  // get html file to string
-  var html;
-  html = fs.readFileSync('./og.html', 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    html = data;
+  if (not (video_data)){
+    res.status(400).send();
+  }else{
+    // get html file to string
+    var html;
+    html = fs.readFileSync('./og.html', 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      html = data;
 
 
-    return  html
-  });
-  console.log(Object.keys(video_data))
+      return  html
+    });
 
-  //add in ogl data
-  html = html.replaceAll("!url",video_data.embedUrl);
-  html = html.replaceAll("!title",video_data.name);
-  html = html.replaceAll("!description",video_data.description);
-  let video_url = video_data.contentUrl;
-  video_url = video_url.substring(0,video_url.lastIndexOf("/"));
-  html = html.replaceAll("!video",video_url);
-  console.log("content_url:"+video_url);
 
-  //send response
-  res.set('Content-Type', 'text/html');
-  res.send(Buffer.from(html));
+    console.log(Object.keys(video_data))
 
+    //add in ogl data
+    html = html.replaceAll("!url",video_data.embedUrl);
+    html = html.replaceAll("!title",video_data.name);
+    html = html.replaceAll("!description",video_data.description);
+    let video_url = video_data.contentUrl;
+    video_url = video_url.substring(0,video_url.lastIndexOf("/"));
+    html = html.replaceAll("!video",video_url);
+    console.log("content_url:"+video_url);
+
+    //send response
+    res.set('Content-Type', 'text/html');
+    res.status(200).send(Buffer.from(html));
+  }
 });
 
 //listen to url, show url
