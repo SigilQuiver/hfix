@@ -4,8 +4,7 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-const hostname = '127.0.0.1';
-const port = 8080;
+const port = process.env.PORT || 4000 
 
 // scrape video data from pmvhaven
 async function get_video(url) {
@@ -80,7 +79,7 @@ app.get("/{*splat}",async (req,res) =>{
 });
 
 //listen to url, show url
-app.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/video/1-the-milf-show-with-moans_696bf6e2c8a41df7bc3bfa3e?from=recommended`);
+app.listen(port, () => {
+  console.log(`Server running!`);
 }); 
 
