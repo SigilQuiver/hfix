@@ -17,11 +17,12 @@ async function get_video(url) {
   // parse
   const $ = cheerio.load(html);
 
+  var d = null;
   //check all scripts that have json type in html head
   for (const el of $('script[type="application/ld+json"]',"head")){
     try{
       // get script content
-      let d = el.children[0].data;
+      d = el.children[0].data;
       // parse content into json
       d = JSON.parse(d);
       // see is json type is video
@@ -33,7 +34,7 @@ async function get_video(url) {
 
     }
   }
-  return null;
+  return d;
 }
 
 app.get("/favicon.ico",(req,res) =>{
@@ -53,8 +54,8 @@ app.get("/{*splat}",async (req,res) =>{
 
   // get video data
   const video_data = await get_video(url);
-
-  if (not (video_data)){
+  console.log(video_data["@type"])
+  if (!(video_data)){
     res.status(400).send();
   }else{
     // get html file to string
@@ -90,6 +91,6 @@ app.get("/{*splat}",async (req,res) =>{
 
 //listen to url, show url
 app.listen(port,host, () => {
-  console.log(`Server running!`);
+  console.log(`Server running at http://${host}:${port}/`);
 }); 
 
