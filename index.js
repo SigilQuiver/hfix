@@ -4,7 +4,8 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-const port = "0.0.0.0";
+const port = 8080
+const host = "0.0.0.0"
 
 // scrape video data from pmvhaven
 async function get_video(url) {
@@ -79,7 +80,7 @@ app.get("/{*splat}",async (req,res) =>{
 });
 
 //listen to url, show url
-app.listen(port, () => {
+app.listen(port,host, () => {
   console.log(`Server running!`);
 }); 
 
