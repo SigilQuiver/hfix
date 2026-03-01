@@ -14,6 +14,8 @@ async function get_video(url) {
   const res2 = await fetch(url);
   const html = await res2.text();
 
+  console.log(html);
+
   // parse
   const $ = cheerio.load(html);
 
