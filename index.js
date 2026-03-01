@@ -16,7 +16,7 @@ async function get_video(url) {
 
   // parse
   const $ = cheerio.load(html);
-
+  
   var d = null;
   //check all scripts that have json type in html head
   for (const el of $('script[type="application/ld+json"]',"head")){
@@ -31,7 +31,7 @@ async function get_video(url) {
         return d;
       }
     } catch (e){
-
+      console.log(e);
     }
   }
   return d;
