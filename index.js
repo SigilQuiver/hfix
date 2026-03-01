@@ -16,7 +16,7 @@ async function get_video(url) {
 
   // parse
   const $ = cheerio.load(html);
-  
+
   var d = null;
   //check all scripts that have json type in html head
   for (const el of $('script[type="application/ld+json"]',"head")){
@@ -54,7 +54,6 @@ app.get("/{*splat}",async (req,res) =>{
 
   // get video data
   const video_data = await get_video(url);
-  console.log(video_data["@type"])
   if (!(video_data)){
     res.status(400).send();
   }else{
