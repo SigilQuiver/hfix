@@ -22,7 +22,10 @@ async function get_video_puppet(url){
 
   // go to url in browser
   await page.goto(url,{ waitUntil: 'networkidle0' });
-  await setTimeout(()=>{},6000);
+
+  // wait until at desired url
+  await page.waitForFunction(`window.location.href == "${url}"`);
+
   const data = await page.evaluate(() => document.querySelector('*').outerHTML);
   console.log(data);
 
