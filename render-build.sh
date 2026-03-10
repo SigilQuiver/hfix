@@ -2,7 +2,7 @@
 #exit on error
 
 set -o errexit
-Install dependencies
+#Install dependencies
 
 npm install
 # Uncomment this line if you need to build your project
