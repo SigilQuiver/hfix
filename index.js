@@ -14,23 +14,25 @@ const host = "0.0.0.0";
 const puppeteer = require("puppeteer")
 
 var browser;
+var page;
 
 // scrape video data from pmvhaven with puppeteer
 async function get_video_puppet(url){
-  console.log("Making new page...")
-  let page = await browser.newPage();
 
   console.log(`Looking at URL:${url}`)
+  // go to url in browser
   await page.goto(url);
 
   console.log("Finished looking at page, evaluating scripts...")
   
+  // look at all scripts in the webpage
   const scripts = await page.$$eval('script[type="application/ld+json"]', (s) => {return s.map((t) => {return JSON.parse(t.innerHTML)})});
 
   console.log("Looking through found scripts...")
 
   //check all scripts that have json type in html head
-  for (let el of scripts){
+  for (const el of scripts){
+    console.log(`* Script:${el}`)
     try{
       // see fs json type is video
       if (el["@type"] == "VideoObject"){
@@ -45,39 +47,6 @@ async function get_video_puppet(url){
   }
 
   return null;
-}
-
-
-// scrape video data from pmvhaven
-async function get_video(url) {
-
-  // get html
-  const res2 = await fetch(url);
-  const html = await res2.text();
-
-  console.log(html);
-
-  // parse
-  const $ = cheerio.load(html);
-
-  var d = null;
-  //check all scripts that have json type in html head
-  for (const el of $('script[type="application/ld+json"]',"head")){
-    try{
-      // get script content
-      d = el.children[0].data;
-      // parse content into json
-      d = JSON.parse(d);
-      // see is json type is video
-      if (d["@type"] == "VideoObject"){
-        //return valid data
-        return d;
-      }
-    } catch (e){
-      console.log(e);
-    }
-  }
-  return d;
 }
 
 app.get("/favicon.ico",(req,res) =>{
@@ -136,8 +105,13 @@ app.get("/{*splat}",async (req,res) =>{
 //listen to url, show url
 app.listen(port,host, async () => {
   //load puppeteer browser
+  console.log("Loading puppeteer browser...")
   browser = await puppeteer.launch();
+
+  console.log("Making a page in the browser...")
+  page = await browser.newPage();
   console.log(`Server running at http://${host}:${port}/`);
+  
 
   //test url
   //console.log(get_video_puppet("https://pmvhaven.com/video/scrolling-madness_66c75486187495e5deea1084?from=recommended"))
