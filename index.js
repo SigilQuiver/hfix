@@ -19,34 +19,39 @@ var page;
 // scrape video data from pmvhaven with puppeteer
 async function get_video_puppet(url){
 
-  console.log(`Looking at URL:${url}`)
+  console.log(`Looking at URL: ${url}`)
+
   // go to url in browser
   await page.goto(url);
 
   console.log("Finished looking at page, evaluating scripts...")
   
   // look at all scripts in the webpage
-  const scripts = await page.$$eval('script[type="application/ld+json"]', (s) => {return s.map((t) => {return JSON.parse(t.innerHTML)})});
+  let scripts = await page.$$eval('script[type="application/ld+json"]', (s) => {return s.map((t) => {return JSON.parse(t.innerHTML)})});
 
   console.log("Looking through found scripts...")
 
-  //check all scripts that have json type in html head
-  for (const el of scripts){
-    console.log(`* Script:${el}`)
-    try{
-      // see fs json type is video
-      if (el["@type"] == "VideoObject"){
-        //return valid data
-        console.log(`Valid script:${el}`);
-        return el;
-      }
-    } catch (e){
-      console.log("ERROR:")
-      console.error(e);
+  let final_script;
+  let current_script;
+
+  // loop through scripts
+  while (scripts.length > 0){
+    current_script = scripts[0];
+
+    // check is script is a video object
+    if (current_script["@type"] == "VideoObject"){
+      
+      //return valid script
+      console.log(`Valid script: ${current_script}`)
+
+      final_script = current_script;
+      break;
     }
+
   }
 
-  return null;
+  // returns nothing if not found
+  return final_script;
 }
 
 app.get("/favicon.ico",(req,res) =>{
@@ -62,17 +67,20 @@ app.get("/{*splat}",async (req,res) =>{
 
   //add url to original url
   const url = "https://pmvhaven.com"+req.originalUrl;
-  console.log("looking at:",url);
 
   // get video data
   const video_data = await get_video_puppet(url);
 
+  // check if video_data was gotten
   if (!(video_data)){
+    console.log("Invalid video data")
     res.status(400).send();
   }else{
+    console.log("Valid video data, getting html file...")
+
     // get html file to string
     var html;
-    html = fs.readFileSync('./og.html', 'utf8', (err, data) => {
+    html = fs.readFileSync('/opt/render/project/src/og.html', 'utf8', (err, data) => {
       if (err) {
         console.error(err);
         return;
@@ -82,7 +90,6 @@ app.get("/{*splat}",async (req,res) =>{
 
       return  html
     });
-
 
     console.log(Object.keys(video_data))
 
@@ -95,6 +102,8 @@ app.get("/{*splat}",async (req,res) =>{
     video_url = video_url.substring(0,video_url.lastIndexOf("/"));
     html = html.replaceAll("!video",video_url);
     console.log("content_url:"+video_url);
+
+    console.log("Finished! /nSending HTML...")
 
     //send response
     res.set('Content-Type', 'text/html');
