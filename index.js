@@ -1,4 +1,3 @@
-const cheerio = require("cheerio");
 const fs = require('node:fs');
 
 // express import
@@ -22,8 +21,9 @@ async function get_video_puppet(url){
   console.log(`Looking at URL: ${url}`)
 
   // go to url in browser
-  await page.goto(url);
-
+  await page.goto(url,{ waitUntil: 'networkidle0' });
+  const data = await page.evaluate(() => document.querySelector('*').outerHTML);
+  console.log(data);
   console.log("Finished looking at page, evaluating scripts...")
   
   // look at all scripts in the webpage
