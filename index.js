@@ -13,24 +13,28 @@ const host = "0.0.0.0";
 const puppeteer = require("puppeteer")
 
 var browser;
-var page;
 
 // scrape video data from pmvhaven with puppeteer
 async function get_video_puppet(url){
+  console.log("Making page...")
+  page = await browser.newPage();
   
   console.log(`Looking at URL: ${url}`)
 
   // go to url in browser
   await page.goto(url,{ waitUntil: 'networkidle0' });
 
-  console.log(page.url());
 
-  // wait until at desired url
-  await page.waitForFunction(`document.title != "Just a moment..."`);
+  // wait for 2 minutes to see if thingy passes?
+  for (let i = 0; i < 20; i++) {
+      await setTimeout(()=>{},6000);
+      console.log(`Page name: ${page.title()}`)
+  }
 
   const data = await page.evaluate(() => document.querySelector('*').outerHTML);
   console.log(data);
 
+  page.close();
   console.log("Finished looking at page, evaluating scripts...")
 
 
@@ -127,7 +131,6 @@ app.listen(port,host, async () => {
   browser = await puppeteer.launch();
 
   console.log("Making a page in the browser...")
-  page = await browser.newPage();
   console.log(`Server running at http://${host}:${port}/`);
   
 
