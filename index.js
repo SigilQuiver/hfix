@@ -17,26 +17,30 @@ var browser;
 
 // scrape video data from pmvhaven with puppeteer
 async function get_video_puppet(url){
+  console.log("Making new page...")
   let page = await browser.newPage();
 
+  console.log(`Looking at URL:${url}`)
   await page.goto(url);
 
-  console.log(url);
+  console.log("Finished looking at page, evaluating scripts...")
   
   const scripts = await page.$$eval('script[type="application/ld+json"]', (s) => {return s.map((t) => {return JSON.parse(t.innerHTML)})});
 
-  //console.log(scripts)
+  console.log("Looking through found scripts...")
+
   //check all scripts that have json type in html head
   for (let el of scripts){
     try{
       // see fs json type is video
       if (el["@type"] == "VideoObject"){
         //return valid data
-        console.log(el);
+        console.log(`Valid script:${el}`);
         return el;
       }
     } catch (e){
-      console.log(e);
+      console.log("ERROR:")
+      console.error(e);
     }
   }
 
@@ -75,8 +79,6 @@ async function get_video(url) {
   }
   return d;
 }
-
-
 
 app.get("/favicon.ico",(req,res) =>{
   res.end();
