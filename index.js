@@ -14,11 +14,14 @@ const puppeteer = require("puppeteer")
 
 var browser;
 
+// delay time func
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 // scrape video data from pmvhaven with puppeteer
 async function get_video_puppet(url){
   console.log("Making page...")
   page = await browser.newPage();
-  
+
   console.log(`Looking at URL: ${url}`)
 
   // go to url in browser
@@ -27,8 +30,8 @@ async function get_video_puppet(url){
 
   // wait for 2 minutes to see if thingy passes?
   for (let i = 0; i < 20; i++) {
-      await setTimeout(()=>{},6000);
-      console.log(`Page name: ${page.title()}`)
+      await delay(6000)
+      console.log(`Page name: ${await page.title()}`)
   }
 
   const data = await page.evaluate(() => document.querySelector('*').outerHTML);
