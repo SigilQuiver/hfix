@@ -13,11 +13,11 @@ const host = "0.0.0.0";
 
 const puppeteer = require("puppeteer")
 
+var browser;
 
 // scrape video data from pmvhaven with puppeteer
 async function get_video_puppet(url){
-  var browser = await puppeteer.launch();
-  const page = await browser.newPage();
+  let page = await browser.newPage();
 
   await page.goto(url);
 
@@ -27,7 +27,7 @@ async function get_video_puppet(url){
 
   //console.log(scripts)
   //check all scripts that have json type in html head
-  for (const el of scripts){
+  for (let el of scripts){
     try{
       // see fs json type is video
       if (el["@type"] == "VideoObject"){
@@ -39,8 +39,6 @@ async function get_video_puppet(url){
       console.log(e);
     }
   }
-
-  
 
   return null;
 }
@@ -134,7 +132,9 @@ app.get("/{*splat}",async (req,res) =>{
 });
 
 //listen to url, show url
-app.listen(port,host, () => {
+app.listen(port,host, async () => {
+  //load puppeteer browser
+  browser = await puppeteer.launch();
   console.log(`Server running at http://${host}:${port}/`);
 
   //test url
