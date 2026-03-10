@@ -17,14 +17,18 @@ var page;
 
 // scrape video data from pmvhaven with puppeteer
 async function get_video_puppet(url){
-
+  
   console.log(`Looking at URL: ${url}`)
 
   // go to url in browser
   await page.goto(url,{ waitUntil: 'networkidle0' });
+  await setTimeout(6000);
   const data = await page.evaluate(() => document.querySelector('*').outerHTML);
   console.log(data);
+
   console.log("Finished looking at page, evaluating scripts...")
+
+
   
   // look at all scripts in the webpage
   let scripts = await page.$$eval('script[type="application/ld+json"]', (s) => {return s.map((t) => {return JSON.parse(t.innerHTML)})});
